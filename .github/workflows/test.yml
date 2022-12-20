@@ -1,0 +1,34 @@
+name: Test
+
+on: [pull_request]
+
+jobs:
+  rwa:
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        machine: [1, 2]
+        enabled: [true, false]
+    env:
+      CYPRESS_API_URL: ${{ secrets.API_URL }}
+      CYPRESS_PROJECT_ID: "B0BAB0"
+      CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_KEY }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - run: yarn install --frozen-lockfile
+      - if: matrix.enabled
+        run: |
+          yarn add cy2@4.0.0-beta.9
+      - if: matrix.enabled == false
+        run: |
+          yarn add cy2@3.4.3
+      - name: Run tests Enabled
+        if: matrix.enabled
+        run: |
+          yarn run cypress run --browser chrome
+      - name: Run tests Disabled
+        if: matrix.enabled == false
+        run: |
+          yarn run cypress run --browser chrome
