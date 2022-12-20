@@ -1,14 +1,15 @@
-name: Test
+name: Test123
 
 on: [pull_request]
 
 jobs:
-  rwa:
+  test:
+    runs-on: ubuntu-20.04
     timeout-minutes: 45
     strategy:
       fail-fast: false
       matrix:
-        machine: [1, 2]
+        machine: [1, 2, 3, 4]
         enabled: [true, false]
     env:
       CYPRESS_API_URL: ${{ secrets.API_URL }}
@@ -27,8 +28,8 @@ jobs:
       - name: Run tests Enabled
         if: matrix.enabled
         run: |
-          yarn run cypress run --browser chrome
+          npx cy2 run --parallel --record --browser chrome --ci-build-id "${{github.run_id}} - ${{github.run_attempt}} - ${{matrix.machine}} - ${{matrix.enabled}}"
       - name: Run tests Disabled
         if: matrix.enabled == false
         run: |
-          yarn run cypress run --browser chrome
+          npx cy2 run --parallel --record --browser chrome --ci-build-id "${{github.run_id}} - ${{github.run_attempt}} - ${{matrix.machine}} - ${{matrix.enabled}}"
